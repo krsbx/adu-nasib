@@ -3,7 +3,47 @@ const asyncMw = require('async-express-mw');
 const jwtToken = require('../utils/token');
 const { compare } = require('../utils/encryption');
 const repository = require('../repository');
-const { ACCOUNT_ROLE } = require('../utils/constant');
+const { ACCOUNT_ROLE, ACCOUNT_STATUS } = require('../utils/constant');
+
+exports.loginMw = asyncMw(async (req, res) => {
+  const user = await repository.user.findOne({ email: req.body.email });
+
+  if (!user) return res.status(404).json({ email: 'User not found!' });
+
+  if (user.status == ACCOUNT_STATUS.INACTIVE)
+    return res.status(401).json({ message: 'Account is inactive!' });
+
+  const isMatch = await compare(req.body.password, user.password);
+  if (!isMatch) return res.status(400).json({ password: 'Wrong password!' });
+
+  const newToken = jwtToken.signAccessToken(_.pick(user, ['id']));
+
+  return res.json({
+    id: user.id,
+    token: newToken,
+  });
+});
+
+exports.registerMw = asyncMw(async (req, res) => {
+  req.body.role = ACCOUNT_ROLE.USER;
+  req.body.status = ACCOUNT_STATUS.INACTIVE;
+
+  const user = await repository.user.findOne({ email: req.body.email });
+
+  if (user) return res.status(401).json({ message: 'Email already in use!' });
+
+  const data = await repository.user.resourceToModel(req.body);
+  await repository.user.create(data);
+
+  return res.json({ message: 'Register success!' });
+});
+
+exports.createUserMw = asyncMw(async (req, res, next) => {
+  const data = await repository.user.resourceToModel(req.body);
+  req.user = await repository.user.create(data);
+
+  return next();
+});
 
 exports.authMw = asyncMw(async (req, res, next) => {
   if (!req.headers.authorization)
@@ -53,20 +93,21 @@ exports.getUserMw = asyncMw(async (req, res, next) => {
   return next();
 });
 
-exports.loginMw = asyncMw(async (req, res) => {
-  const user = await repository.user.findOne({ email: req.body.email });
+exports.updateUserMw = asyncMw(async (req, res, next) => {
+  const { userAuth } = req;
 
-  if (!user) return res.status(404).json({ email: 'User not found!' });
+  if (userAuth.role !== ACCOUNT_ROLE.ADMIN) delete req.body.role;
 
-  const isMatch = await compare(req.body.password, user.password);
-  if (!isMatch) return res.status(400).json({ password: 'Wrong password!' });
+  const data = await repository.user.resourceToModel(req.body);
+  await repository.user.update(req.params.id, data);
 
-  const newToken = jwtToken.signAccessToken(_.pick(user, ['id']));
+  return next();
+});
 
-  return res.json({
-    id: user.id,
-    token: newToken,
-  });
+exports.deleteUserMw = asyncMw(async (req, res) => {
+  await repository.user.delete(req.params.id);
+
+  return res.json({ id: req.params.id, message: 'User deleted!' });
 });
 
 exports.returnUsersMw = asyncMw(async (req, res) => {

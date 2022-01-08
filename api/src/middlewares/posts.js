@@ -51,16 +51,14 @@ exports.isPostOwnerMw = asyncMw(async (req, res, next) => {
 });
 
 exports.updatePostMw = asyncMw(async (req, res, next) => {
-  const { post } = req;
-
   const data = await repository.post.resourceToModel(req.body);
-  await repository.post.update(post.id, data);
+  await repository.post.update(req.params.id, data);
 
   return next();
 });
 
 exports.deletePostMw = asyncMw(async (req, res) => {
-  await repository.post.delete(req.post.id);
+  await repository.post.delete(req.params.id);
 
   return res.json({ id: req.params.id, message: 'Post deleted!' });
 });

@@ -63,16 +63,14 @@ exports.isCommentOwnerMw = asyncMw(async (req, res, next) => {
 });
 
 exports.updateCommentMw = asyncMw(async (req, res, next) => {
-  const { comment } = req;
-
   const data = await repository.comment.resourceToModel(req.body);
-  await repository.comment.update(comment.id, data);
+  await repository.comment.update(req.params.id, data);
 
   return next();
 });
 
 exports.deleteCommentMw = asyncMw(async (req, res) => {
-  await repository.comment.delete(req.comment.id);
+  await repository.comment.delete(req.params.id);
 
   return res.json({ id: req.params.id, message: 'Comment deleted!' });
 });

@@ -5,5 +5,5 @@ exports.encrypt = async (text) => {
   return await bcrypt.hash(text, salt);
 };
 
-exports.decrypt = async (text, encrypted) =>
+exports.compare = async (text, encrypted) =>
   await bcrypt.compare(text, encrypted);

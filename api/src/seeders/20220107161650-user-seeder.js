@@ -13,6 +13,13 @@ module.exports = {
         role: ACCOUNT_ROLE.ADMIN,
         status: ACCOUNT_STATUS.ACTIVE,
       },
+      {
+        email: 'user@user.com',
+        password: await encrypt('user'),
+        username: 'Gw User',
+        role: ACCOUNT_ROLE.USER,
+        status: ACCOUNT_STATUS.ACTIVE,
+      },
     ]),
   down: async (queryInterface) => queryInterface.bulkDelete('Users', {}, null),
 };

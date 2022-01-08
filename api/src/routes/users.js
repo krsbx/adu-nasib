@@ -3,8 +3,18 @@ const usersMw = require('../middlewares/users');
 const postsMw = require('../middlewares/posts');
 const commentsMw = require('../middlewares/comments');
 
+// POST /api/users/
+router.post(
+  '/',
+  usersMw.authMw,
+  usersMw.isAdminMw,
+  usersMw.createUserMw,
+  usersMw.returnUserMw
+);
 // POST /api/users/login
 router.post('/login', usersMw.loginMw);
+// POST /api/users/register
+router.post('/register', usersMw.registerMw);
 // GET /api/users
 router.get(
   '/',
@@ -31,5 +41,16 @@ router.get(
   commentsMw.getCommentsByUserMw,
   commentsMw.returnCommentsMw
 );
+// PATCH /api/users/:id
+router.patch(
+  '/:id',
+  usersMw.authMw,
+  usersMw.getUserMw,
+  usersMw.updateUserMw,
+  usersMw.getUserMw,
+  usersMw.returnUserMw
+);
+// DELETE /api/users/:id
+router.patch('/:id', usersMw.authMw, usersMw.getUserMw, usersMw.deleteUserMw);
 
 module.exports = router;

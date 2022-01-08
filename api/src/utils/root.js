@@ -11,5 +11,6 @@ module.exports = (app) => {
   app.use(express.static('public'));
 
   app.use('/api/users', require('../routes/users'));
-  app.use('/api/post', require('../routes/posts'));
+  app.use('/api/posts', require('../routes/posts'));
+  app.use('/api/comments', require('../routes/comments'));
 };

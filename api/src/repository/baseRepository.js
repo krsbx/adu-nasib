@@ -7,7 +7,7 @@ const moment = require('moment');
  * @param {object} conditions
  * @param {object} filterQueryParams
  * @param {object} options              { limit, page, ... }
- * @return {function(*=, *, *=): Promise<Model[]>}
+ * @return {(conditions: object, filterQueryParams: object, options: object): Promise<Model[]>}
  */
 exports.findAll =
   (model) =>

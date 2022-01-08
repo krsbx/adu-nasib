@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const usersMw = require('../middlewares/users');
 const postsMw = require('../middlewares/posts');
+const commentsMw = require('../middlewares/comments');
 
 // POST /api/posts
 router.post('/', usersMw.authMw, postsMw.createPostMw, postsMw.returnPostMw);
@@ -8,8 +9,16 @@ router.post('/', usersMw.authMw, postsMw.createPostMw, postsMw.returnPostMw);
 router.get('/', usersMw.authMw, postsMw.getPostsMw, postsMw.returnPostsMw);
 // GET /api/posts/:id
 router.get('/:id', usersMw.authMw, postsMw.getPostMw, postsMw.returnPostMw);
+// GET /api/posts/:id/comments
+router.get(
+  '/:id',
+  usersMw.authMw,
+  postsMw.getPostMw,
+  commentsMw.getCommentsByPostMw,
+  commentsMw.returnCommentsMw
+);
 // PATCH /api/posts/:id
-router.put(
+router.patch(
   '/:id',
   usersMw.authMw,
   postsMw.getPostMw,

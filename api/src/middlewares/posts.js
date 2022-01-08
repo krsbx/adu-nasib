@@ -29,6 +29,18 @@ exports.getPostMw = asyncMw(async (req, res, next) => {
   return next();
 });
 
+exports.getPostsByUserMw = asyncMw(async (req, res, next) => {
+  req.posts = await repository.post.findAll(
+    {
+      userId: req.user.id,
+    },
+    req.filterQueryParams,
+    req.query
+  );
+
+  return next();
+});
+
 exports.isPostOwnerMw = asyncMw(async (req, res, next) => {
   const { post } = req;
 

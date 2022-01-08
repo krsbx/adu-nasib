@@ -4,7 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "db:migrate": "sequelize-cli db:migrate",
+    "db:undo-migrate": "sequelize-cli db:migrate:undo:all",
+    "seed": "sequelize-cli db:seed:all --debug"
   },
   "keywords": [],
   "author": "",

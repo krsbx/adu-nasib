@@ -112,10 +112,13 @@ exports.deleteUserMw = asyncMw(async (req, res) => {
 
 exports.returnUsersMw = asyncMw(async (req, res) => {
   const users = await Promise.all(
-    _.map(req.users, (user) => repository.user.modelToResource(user))
+    _.map(req.users.rows, (user) => repository.user.modelToResource(user))
   );
 
-  return res.json(users);
+  return res.json({
+    rows: users,
+    count: _.get(req, 'users.count', 0),
+  });
 });
 
 exports.returnUserMw = asyncMw(async (req, res) => {

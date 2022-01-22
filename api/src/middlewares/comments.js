@@ -77,12 +77,15 @@ exports.deleteCommentMw = asyncMw(async (req, res) => {
 
 exports.returnCommentsMw = asyncMw(async (req, res) => {
   const comments = await Promise.all(
-    _.map(req.comments, (comment) =>
+    _.map(req.comments.rows, (comment) =>
       repository.comment.modelToResource(comment)
     )
   );
 
-  return res.json(comments);
+  return res.json({
+    rows: comments,
+    count: _.get(req, 'comments.count', 0),
+  });
 });
 
 exports.returnCommentMw = asyncMw(async (req, res) => {

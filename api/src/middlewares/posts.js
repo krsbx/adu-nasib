@@ -65,10 +65,13 @@ exports.deletePostMw = asyncMw(async (req, res) => {
 
 exports.returnPostsMw = asyncMw(async (req, res) => {
   const posts = await Promise.all(
-    _.map(req.posts, (post) => repository.post.modelToResource(post))
+    _.map(req.posts.rows, (post) => repository.post.modelToResource(post))
   );
 
-  return res.json(posts);
+  return res.json({
+    rows: posts,
+    count: _.get(req, 'posts.count', 0),
+  });
 });
 
 exports.returnPostMw = asyncMw(async (req, res) => {

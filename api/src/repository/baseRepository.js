@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { Op, Sequelize } = require('sequelize');
+const { Op, Sequelize, Model } = require('sequelize');
 const moment = require('moment');
 
 /**
@@ -7,7 +7,7 @@ const moment = require('moment');
  * @param {object} conditions
  * @param {object} filterQueryParams
  * @param {object} options              { limit, page, ... }
- * @return {(conditions: object, filterQueryParams: object, options: object): Promise<Model[]>}
+ * @return {(conditions: object, filterQueryParams: object, options: object) => Promise<{rows: Model[], count: number}>}
  */
 exports.findAll =
   (model) =>
@@ -73,7 +73,7 @@ exports.findAll =
       where[Op.and] = rules;
     }
 
-    return model.findAll({
+    return model.findAndCountAll({
       where,
       ...(limit === 0 ? {} : { limit }),
       offset,
@@ -85,7 +85,7 @@ exports.findAll =
  * create a new record
  *
  * @param {object} model
- * @returns {(data: object) => Model}
+ * @returns {(data: object) => Promise<Model>}
  */
 exports.create = (model) => (data) => model.create(data);
 
@@ -93,7 +93,7 @@ exports.create = (model) => (data) => model.create(data);
  * update by id or a set conditions
  *
  * @param {object} model
- * @returns {(conditions: object | number, data: object) => Model}
+ * @returns {(conditions: object | number, data: object) => Promise<Model>}
  */
 exports.update = (model) => (conditions, data) => {
   const dbCond = _.isObject(conditions) ? conditions : { id: conditions };
@@ -104,7 +104,7 @@ exports.update = (model) => (conditions, data) => {
  * delete multiple records by conditions
  *
  * @param {object} model
- * @returns {(conditions: object | number) => Model}
+ * @returns {(conditions: object | number) => Promise<Model>}
  */
 exports.delete = (model) => (conditions) => {
   const dbCond = _.isObject(conditions) ? conditions : { id: conditions };
